@@ -1,5 +1,6 @@
 package com.yupi.project.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yupi.project.common.ErrorCode;
@@ -9,6 +10,7 @@ import com.yupi.project.model.entity.User;
 import com.yupi.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -35,6 +37,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     /**
      * 盐值，混淆密码
      */
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     private static final String SALT = "yupi";
 
     @Override
@@ -71,6 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
             }
+            stringRedisTemplate.opsForValue().set(userAccount, JSONUtil.toJsonStr(user));
             return user.getId();
         }
     }
@@ -90,6 +95,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         // 查询用户是否存在
+        String userStr = stringRedisTemplate.opsForValue().get(userAccount);
+        if (StringUtils.isNotBlank(userStr)) {
+            User user = JSONUtil.toBean(userStr, User.class);
+            if (!user.getUserPassword().equals(encryptPassword)) {
+                log.info("密码不正确!");
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码错误");
+            }
+            request.getSession().setAttribute(USER_LOGIN_STATE, user);
+            return user;
+        }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
         queryWrapper.eq("userPassword", encryptPassword);
@@ -118,7 +133,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        String userAccount = currentUser.getUserAccount();
+        String userStr = stringRedisTemplate.opsForValue().get(userAccount);
+        if (StringUtils.isNotBlank(userStr)) {
+            return JSONUtil.toBean(userStr, User.class);
+        }
+
         long userId = currentUser.getId();
         currentUser = this.getById(userId);
         if (currentUser == null) {

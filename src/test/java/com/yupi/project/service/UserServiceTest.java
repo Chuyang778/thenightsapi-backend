@@ -1,8 +1,12 @@
 package com.yupi.project.service;
 
+import java.util.Date;
+
 import com.yupi.project.model.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -18,9 +22,24 @@ class UserServiceTest {
     @Resource
     private UserService userService;
 
+    @Resource
+    private RedissonClient redissonClient;
+
     @Test
     void testAddUser() {
         User user = new User();
+        user.setId(0L);
+        user.setUserName("Asherly");
+        user.setUserAccount("123456");
+        user.setUserAvatar("aa");
+        user.setGender(0);
+        user.setUserRole("ad");
+        user.setUserPassword("asrfaf");
+        user.setCreateTime(new Date());
+        user.setUpdateTime(new Date());
+        user.setIsDelete(0);
+
+
         boolean result = userService.save(user);
         System.out.println(user.getId());
         Assertions.assertTrue(result);
@@ -78,4 +97,5 @@ class UserServiceTest {
 
         }
     }
+
 }
