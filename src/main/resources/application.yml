@@ -37,5 +37,5 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 chuyangapi:
   client:
-    access-key: asdafas
-    secret-key: afafad1asd
+    access-key: asdadrf
+    secret-key: qewqwerq
