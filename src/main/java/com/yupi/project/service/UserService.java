@@ -56,4 +56,6 @@ public interface UserService extends IService<User> {
      * @return
      */
     boolean userLogout(HttpServletRequest request);
+
+    boolean changeKey(String accessKey,String secretKey,HttpServletRequest request);
 }

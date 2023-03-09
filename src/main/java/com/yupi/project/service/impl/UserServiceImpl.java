@@ -1,5 +1,8 @@
 package com.yupi.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -67,10 +70,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             }
             // 2. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-            // 3. 插入数据
+
+            //3. 分配accessKey,secretKey;
+            String accessKey = DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(5));
+            String secretKey = DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(8));
+            // 4. 插入数据
             User user = new User();
             user.setUserAccount(userAccount);
             user.setUserPassword(encryptPassword);
+            user.setAccessKey(accessKey);
+            user.setSecretKey(secretKey);
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
@@ -174,6 +183,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return true;
+    }
+
+    @Override
+    public boolean changeKey(String accessKey,String secretKey,HttpServletRequest request) {
+        User user = getLoginUser(request);
+        if(user == null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        if(StringUtils.isAnyBlank(accessKey,secretKey)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        String userAccount = user.getUserAccount();
+        String newaccessKey = DigestUtil.md5Hex(SALT + userAccount + accessKey);
+        String newsecretKey = DigestUtil.md5Hex(SALT + userAccount + secretKey);
+        user.setAccessKey(newaccessKey);
+        user.setSecretKey(newsecretKey);
+        this.updateById(user);
+        stringRedisTemplate.opsForValue().set(userAccount,JSONUtil.toJsonStr(user));
         return true;
     }
 

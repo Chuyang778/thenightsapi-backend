@@ -8,7 +8,6 @@ import com.yupi.project.common.DeleteRequest;
 import com.yupi.project.common.ErrorCode;
 import com.yupi.project.common.ResultUtils;
 import com.yupi.project.exception.BusinessException;
-import com.yupi.project.model.dto.*;
 import com.yupi.project.model.dto.user.*;
 import com.yupi.project.model.entity.User;
 import com.yupi.project.model.vo.UserVO;
@@ -234,6 +233,12 @@ public class UserController {
         }).collect(Collectors.toList());
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
+    }
+
+    @PostMapping("/changeKey")
+    public BaseResponse<Boolean> changeKey(String accessKey,String secretKey,HttpServletRequest request){
+        boolean result = userService.changeKey(accessKey, secretKey, request);
+        return ResultUtils.success(result);
     }
 
     // endregion
