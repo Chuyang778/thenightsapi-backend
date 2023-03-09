@@ -3,11 +3,13 @@ package com.yupi.project.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chuyang.chuyangapiclientsdk.client.ChuYangapiClient;
+import com.google.gson.Gson;
 import com.yupi.project.annotation.AuthCheck;
 import com.yupi.project.common.*;
 import com.yupi.project.controller.constant.CommonConstant;
 import com.yupi.project.exception.BusinessException;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoAddRequest;
+import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
 import com.yupi.project.model.entity.InterfaceInfo;
@@ -200,7 +202,7 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 更新
+     * 上线接口
      *
      * @param idRequest
      * @param request
@@ -236,7 +238,7 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 更新
+     * 下线接口
      *
      * @param idRequest
      * @param request
@@ -262,6 +264,41 @@ public class InterfaceInfoController {
 
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 下线接口
+     *
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/invoke")
+    public BaseResponse<Object> offlineInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                      HttpServletRequest request) {
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        long id = interfaceInfoInvokeRequest.getId();
+        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if(oldInterfaceInfo.getStatus() == OFFLINE.getValue()){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口已经关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        ChuYangapiClient tempClient = new ChuYangapiClient(accessKey,secretKey);
+        Gson gson = new Gson();
+        com.chuyang.chuyangapiclientsdk.model.User user = gson.fromJson(userRequestParams,com.chuyang.chuyangapiclientsdk.model.User.class);
+        String usernameByPost = tempClient.getUsernameByPost(user);
+        return ResultUtils.success(usernameByPost);
     }
 
     // endregion

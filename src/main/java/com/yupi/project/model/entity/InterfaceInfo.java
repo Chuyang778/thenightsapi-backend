@@ -4,13 +4,15 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 
 /**
  * 接口信息
+ *
  * @TableName interface_info
  */
-@TableName(value ="interface_info")
+@TableName(value = "interface_info")
 @Data
 public class InterfaceInfo implements Serializable {
     /**
@@ -33,6 +35,11 @@ public class InterfaceInfo implements Serializable {
      * 接口地址
      */
     private String url;
+
+    /**
+     * 请求参数
+     */
+    private String requestParams;
 
     /**
      * 请求头
