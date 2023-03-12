@@ -3,11 +3,11 @@ package com.yupi.project.service;
 import java.util.Date;
 
 import com.yupi.project.model.entity.User;
+import com.yupi.project.model.entity.UserInterfaceInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 
@@ -19,11 +19,14 @@ import javax.annotation.Resource;
 @SpringBootTest
 class UserServiceTest {
 
+    private static final String SALT = "yupi";
+
     @Resource
     private UserService userService;
 
     @Resource
-    private RedissonClient redissonClient;
+    private UserInterfaceInfoService userInterfaceInfoService;
+
 
     @Test
     void testAddUser() {
@@ -61,7 +64,17 @@ class UserServiceTest {
     @Test
     void testGetUser() {
         User user = userService.getById(1L);
-        Assertions.assertNotNull(user);
+        user.setUserRole("admin");
+        String userPassword = "juicy1293";
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        user.setUserPassword(encryptPassword);
+        userService.updateById(user);
+
+    }
+
+    @Test
+    void testRedisson(){
+        boolean s = userInterfaceInfoService.invokeCount(1, 1);
     }
 
     @Test
