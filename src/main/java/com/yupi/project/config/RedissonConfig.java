@@ -1,6 +1,5 @@
 package com.yupi.project.config;
 
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.C;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;

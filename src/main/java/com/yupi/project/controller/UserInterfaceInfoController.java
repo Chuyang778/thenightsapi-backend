@@ -204,6 +204,12 @@ public class UserInterfaceInfoController {
         return ResultUtils.success(userInterfaceInfoPage);
     }
 
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @GetMapping("/invokecount/{interfaceInfoId}/{userId}")
+    public BaseResponse<Boolean> invokecount(@PathVariable("interfaceInfoId")Long interfaceInfoId,@PathVariable("userId")Long userId){
+        boolean result = userInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+        return ResultUtils.success(result);
+    }
 
     // endregion
 }
