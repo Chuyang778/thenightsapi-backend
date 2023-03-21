@@ -1,6 +1,7 @@
 package com.yupi.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONUtil;
@@ -19,6 +20,8 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.time.LocalDateTime;
 
 import static com.yupi.project.controller.constant.UserConstant.ADMIN_ROLE;
 import static com.yupi.project.controller.constant.UserConstant.USER_LOGIN_STATE;
@@ -80,7 +83,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             user.setUserPassword(encryptPassword);
             user.setAccessKey(accessKey);
             user.setSecretKey(secretKey);
-            user.setUserRole("admin");
+            user.setUserRole("user");
+            user.setCreateTime(DateTime.now());
+            user.setUpdateTime(DateTime.now());
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");

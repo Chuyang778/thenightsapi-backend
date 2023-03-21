@@ -20,6 +20,10 @@ spring:
     host: 192.168.157.128
     database: 0
     password: 123456
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 
 
 
