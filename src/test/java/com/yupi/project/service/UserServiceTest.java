@@ -10,24 +10,18 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.yupi.project.model.entity.User;
-import com.yupi.project.model.entity.UserInterfaceInfo;
 import com.yupi.project.utils.AliOSSUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.io.CloseMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
 
@@ -146,7 +140,7 @@ class UserServiceTest {
     @Test
     void testHttpclientServer() throws IOException {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            ClassicHttpRequest httpGet = ClassicRequestBuilder.get("http://httpbin.org/get")
+            ClassicHttpRequest httpGet = ClassicRequestBuilder.get("http://localhost:800/api/name/get?name=haha")
                     .build();
             // The underlying HTTP connection is still held by the response object
             // to allow the response content to be streamed directly from the network socket.

@@ -2,24 +2,19 @@ package com.yupi.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.chuyang.chuyangapiclientsdk.client.ChuYangapiClient;
-import com.google.gson.Gson;
+import com.yupi.project.common.BaseResponse;
+import com.yupi.project.common.DeleteRequest;
+import com.yupi.project.common.ErrorCode;
+import com.yupi.project.common.ResultUtils;
+import com.yupi.project.exception.BusinessException;
+import com.yupi.project.model.entity.User;
 import com.yupi.project.annotation.AuthCheck;
-import com.yupi.project.common.*;
 import com.yupi.project.controller.constant.CommonConstant;
 import com.yupi.project.controller.constant.UserConstant;
-import com.yupi.project.exception.BusinessException;
-import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoAddRequest;
-import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
-import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
-import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
 import com.yupi.project.model.dto.userinterfaceinfo.UserInterfaceInfoAddRequest;
 import com.yupi.project.model.dto.userinterfaceinfo.UserInterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.userinterfaceinfo.UserInterfaceInfoUpdateRequest;
-import com.yupi.project.model.entity.InterfaceInfo;
-import com.yupi.project.model.entity.User;
 import com.yupi.project.model.entity.UserInterfaceInfo;
-import com.yupi.project.service.InterfaceInfoService;
 import com.yupi.project.service.UserInterfaceInfoService;
 import com.yupi.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-
-import static com.yupi.project.model.enums.InterfaceInfoStatusEnum.OFFLINE;
-import static com.yupi.project.model.enums.InterfaceInfoStatusEnum.ONLINE;
 
 /**
  * @author ChuYang

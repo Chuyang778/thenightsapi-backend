@@ -1,6 +1,5 @@
 package com.yupi.project.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -8,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yupi.project.common.ErrorCode;
+import com.yupi.project.controller.constant.UserConstant;
 import com.yupi.project.exception.BusinessException;
 import com.yupi.project.mapper.UserMapper;
 import com.yupi.project.model.entity.User;
@@ -20,11 +20,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
-import java.time.LocalDateTime;
-
-import static com.yupi.project.controller.constant.UserConstant.ADMIN_ROLE;
-import static com.yupi.project.controller.constant.UserConstant.USER_LOGIN_STATE;
 
 
 /**
@@ -83,7 +78,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             user.setUserPassword(encryptPassword);
             user.setAccessKey(accessKey);
             user.setSecretKey(secretKey);
-            user.setUserRole("user");
+            user.setUserRole("admin");
             user.setCreateTime(DateTime.now());
             user.setUpdateTime(DateTime.now());
             boolean saveResult = this.save(user);
@@ -117,7 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 log.info("密码不正确!");
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码错误");
             }
-            request.getSession().setAttribute(USER_LOGIN_STATE, user);
+            request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
             return user;
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -130,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         stringRedisTemplate.opsForValue().set(userAccount, JSONUtil.toJsonStr(user));
         return user;
     }
@@ -144,7 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
@@ -172,9 +167,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User user = (User) userObj;
-        return user != null && ADMIN_ROLE.equals(user.getUserRole());
+        return user != null && UserConstant.ADMIN_ROLE.equals(user.getUserRole());
     }
 
     /**
@@ -184,11 +179,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+        if (request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE) == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
         return true;
     }
 

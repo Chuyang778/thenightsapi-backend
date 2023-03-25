@@ -30,7 +30,7 @@ public class AliOSSUtils {
         OSS ossClient = new OSSClientBuilder().build(endpoint,accessKeyId,accessKeySecret);
         ossClient.putObject(bucketName,fileName,inputStream);
 
-        String url = endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/";
+        String url = endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/" + fileName;
         ossClient.shutdown();
         return url;
     }
