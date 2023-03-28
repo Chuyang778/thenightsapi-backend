@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -43,6 +44,7 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         }
     }
 
+    @Transactional
     @Override
     public boolean invokeCount(long interfaceInfoId, long userId) {
         if (interfaceInfoId <= 0 || userId <= 0) {
