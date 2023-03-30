@@ -24,7 +24,25 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
+  # rabbitmq配置
+  rabbitmq:
+    virtual-host: /
+    host: 192.168.157.128
+    port: 15672
+    username: admin
+    password: 123
 
+mq:
+  env: centos7
+  basic:
+    info:
+      queue:
+        name: ${mq.env}.middleware.mq.basic.info.queue
+      exchange:
+        name: ${mq.env}.middleware.mq.basic.info.exchange
+      routing:
+        key:
+          name: ${mq.env}.middleware.mq.basic.info.routing.key
 
 
 server:
@@ -55,5 +73,6 @@ dubbo:
   registry:
     id: nacos-registry
     address: nacos://192.168.157.128:8848
+
 
 

@@ -11,6 +11,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.yupi.project.model.entity.User;
 import com.yupi.project.utils.AliOSSUtils;
+import com.yupi.project.utils.RedPocketUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -43,6 +44,9 @@ class UserServiceTest {
 
     @Resource
     private AliOSSUtils aliOSSUtils;
+
+    @Resource
+    private RedPocketUtils redPocketUtils;
 
 
     @Test
