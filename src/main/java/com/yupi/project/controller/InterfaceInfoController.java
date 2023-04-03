@@ -15,6 +15,7 @@ import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
 import com.yupi.project.model.entity.InterfaceInfo;
 import com.yupi.project.service.InterfaceInfoService;
+import com.yupi.project.service.UserInterfaceInfoService;
 import com.yupi.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,9 @@ public class InterfaceInfoController {
 
     @Resource
     private ChuYangapiClient chuYangapiClient;
+
+    @Resource
+    private UserInterfaceInfoService userInterfaceInfoService;
 
     // region 增删改查
 
@@ -296,8 +300,9 @@ public class InterfaceInfoController {
         ChuYangapiClient tempClient = new ChuYangapiClient(accessKey,secretKey);
         Gson gson = new Gson();
         com.chuyang.chuyangapiclientsdk.model.User user = gson.fromJson(userRequestParams,com.chuyang.chuyangapiclientsdk.model.User.class);
-        String usernameByPost = tempClient.getUsernameByPost(user);
-        return ResultUtils.success(usernameByPost);
+        boolean result = userInterfaceInfoService.invokeCount(1, 1);
+        if(result) return ResultUtils.success(tempClient.getUsernameByPost(user));
+        return ResultUtils.error(ErrorCode.OPERATION_ERROR);
     }
 
     // endregion
